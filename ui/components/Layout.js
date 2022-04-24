@@ -1,5 +1,7 @@
 import {
+  UserAddIcon,
   SparklesIcon,
+  CurrencyDollarIcon,
   HomeIcon,
   NewspaperIcon,
   KeyIcon,
@@ -23,6 +25,7 @@ import Blockies from 'react-blockies'
 import { useConnect } from 'wagmi'
 import { nationToken } from '../lib/config'
 import { connectorIcons } from '../lib/connectors'
+import { useHasPassport } from '../lib/passport-nft'
 import { useHandleError } from '../lib/use-handle-error'
 import { useAccount } from '../lib/use-wagmi'
 import Logo from '../public/logo.svg'
@@ -35,11 +38,11 @@ const navigation = [
     href: '/',
     icon: <ViewGridIcon className="h-5 w-5" />,
   },
-  /*{
+  {
     name: 'Become a citizen',
     href: '/join',
     icon: <UserAddIcon className="h-5 w-5" />,
-  },*/
+  },
   {
     name: 'Claim airdrop',
     href: '/claim',
@@ -81,9 +84,30 @@ export default function Layout({ children }) {
     })
   )
 
+  const [{ data: hasPassport, loading: hasPassportLoading }] = useHasPassport(
+    account?.address
+  )
+
   const [nav, setNav] = useState(navigation)
 
   const errorContext = useErrorContext()
+
+  useEffect(() => {
+    if (!hasPassportLoading) {
+      if (hasPassport) {
+        navigation[1].name = 'Welcome citizen'
+        navigation[1].href = '/citizen'
+        setNav(navigation)
+        if (router.pathname === '/join' && !router.query.mintingPassport) {
+          router.push('/citizen')
+        }
+      } else {
+        if (router.pathname === '/citizen') {
+          router.push('/join')
+        }
+      }
+    }
+  }, [hasPassport, hasPassportLoading, router.pathname])
 
   return (
     <div className="mx-auto bg-n3bg font-display">

@@ -1,13 +1,19 @@
+import { ethers } from 'ethers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useRef, useEffect, useState } from 'react'
 import {
+  veNationRequiredStake,
+  veNationRewardsMultiplier,
   nationToken,
 } from '../lib/config'
 import { useNationBalance } from '../lib/nation-token'
+import { useHasPassport } from '../lib/passport-nft'
 import { useAccount } from '../lib/use-wagmi'
 import { useVeNationBalance } from '../lib/ve-token'
+import ActionButton from '../components/ActionButton'
+import Balance from '../components/Balance'
 import GradientLink from '../components/GradientLink'
 import Head from '../components/Head'
 import flag from '../public/flag.svg'
@@ -19,15 +25,22 @@ export default function Index() {
     useNationBalance(account?.address)
   const [{ data: veNationBalance, loading: veNationBalanceLoading }] =
     useVeNationBalance(account?.address)
+  const [{ data: hasPassport, loading: hasPassportLoading }] = useHasPassport(
+    account?.address
+  )
 
   const [fromTweetdrop, setFromTweetdrop] = useState(false)
 
   useEffect(() => {
-    setFromTweetdrop(true)
-  }, [router])
+    if (!hasPassportLoading) {
+      if (!hasPassport && router.query.source === 'tweetdrop') {
+        setFromTweetdrop(true)
+      }
+    }
+  }, [hasPassport, hasPassportLoading, router])
 
   const loading =
-    nationBalanceLoading || veNationBalanceLoading
+    nationBalanceLoading || veNationBalanceLoading || hasPassportLoading
 
   return (
     <>

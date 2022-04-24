@@ -22,7 +22,7 @@ if (process.env.NEXT_PUBLIC_CHAIN !== 'mainnet') {
   const devConfig = {
     nationToken: devDeployments.nationToken || zeroAddress,
     veNationToken: devDeployments.veNationToken || zeroAddress,
-    veNationRequiredStake: 2,
+    veNationRequiredStake: 10,
     veNationRewardsMultiplier: '2.5',
     balancerVault: devDeployments.balancerPool || zeroAddress,
     balancerLPToken: devDeployments.balancerPair || zeroAddress,
